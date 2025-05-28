@@ -18,6 +18,10 @@ export default function LoginScreen() {
     }
   };
 
+  // Renders the login screen with 
+  // - Title
+  // - Spotify login button
+  // - Token status message 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Siftify</Text>
