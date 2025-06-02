@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Dimensions } from 'react-native';
 import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { authenticateWithSpotify } from '../services/spotifyAuth';
+import { Image } from 'react-native';
 
+// Decompose the height from the window object
 const { height } = Dimensions.get('window');
 
 export default function LoginScreen() {
@@ -25,6 +27,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Siftify</Text>
+      <Image source={require('../assets/siftify-icon.png')} style={styles.icon}/>
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>
@@ -36,6 +39,7 @@ export default function LoginScreen() {
   );
 }
 
+// Style sheet for the LoginScreen component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -44,11 +48,16 @@ const styles = StyleSheet.create({
     padding: 24,
     backgroundColor: '#545454',
   },
+  icon: {
+    width: 250,
+    height: 150,
+    marginBottom: height * 0.1, // 5% of the screen height
+    marginLeft: 22,
+  },
   title: {
-    fontFamily : 'Poppins',
+    fontFamily : 'Arial',
     fontWeight: 'bold',
-    fontSize: 50,
-    marginBottom: height * 0.1,
+    fontSize: 72,
     color: 'white',
   },
   loginButton: {
@@ -58,7 +67,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loginButtonText: {
-    fontFamily: 'Poppins',
+    fontFamily: 'Arial',
     fontWeight: 'bold',
     color: '#fff',
     fontSize: 32,
@@ -80,7 +89,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footerText: {
-    fontFamily: 'Poppins',
+    fontFamily: 'Arial',
     fontSize: 14,
     color: '#fff',
     textAlign: 'center',

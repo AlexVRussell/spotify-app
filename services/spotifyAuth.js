@@ -3,6 +3,7 @@ import * as Random from 'expo-random';
 import { Buffer } from 'buffer';
 global.Buffer = Buffer;
 import { makeRedirectUri } from 'expo-auth-session';
+import * as Crypto from 'expo-crypto';
 
 const CLIENT_ID = SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = makeRedirectUri( {useProxy: true} );
@@ -14,7 +15,7 @@ const AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize';
 const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
 
 // Encoding for PKCE with Base64URL
-const base64UrlEncode = (buffer) => {
+const base64URLEncode = (buffer) => {
     return Buffer.from(buffer)
         .toString('base64')
         .replace(/\+/g, '-')
@@ -24,8 +25,13 @@ const base64UrlEncode = (buffer) => {
 
 // Hash PKCE using SHA256
 const sha256 = async (buffer) => {
-    const digest = await crypto.subtle.digest('SHA-256', buffer);
-    return new Uint8Array(digest);
+    const hash = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    new TextDecoder().decode(buffer),
+    { encoding: Crypto.CryptoEncoding.BASE64 }
+  );
+
+  return Uint8Array.from(Buffer.from(hash, 'base64'));
 }
 
 export async function authenticateWithSpotify() {
