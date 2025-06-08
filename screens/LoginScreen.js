@@ -12,18 +12,21 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     try {
-      const data = await authenticateWithSpotify();
-      setToken(data.access_token);
-      console.log('Access token:', data.access_token);
+    const tokenData = await authenticateWithSpotify();
+    // Now store tokenData.access_token in context
     } catch (err) {
-      console.error('Auth failed:', err);
+      console.error('Login failed:', err);
     }
   };
 
-  // Renders the login screen with 
-  // - Title
-  // - Spotify login button
-  // - Token status message 
+  /**
+   * LoginScreen component
+   * This component includes:
+   * - The app title
+   * - An icon image
+   * - A login button that triggers Spotify authentication
+   * - The footer with developer information
+   */
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Siftify</Text>
@@ -51,7 +54,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 250,
     height: 150,
-    marginBottom: height * 0.1, // 5% of the screen height
+    marginBottom: height * 0.1,
     marginLeft: 22,
   },
   title: {
