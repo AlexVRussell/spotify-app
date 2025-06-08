@@ -1,5 +1,5 @@
 import { SPOTIFY_CLIENT_ID } from '@env';
-import { makeRedirectUri, startAsync } from 'expo-auth-session';
+import { makeRedirectUri, exchangeCodeAsync, AuthRequest } from 'expo-auth-session';
 import * as Crypto from 'expo-crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Buffer } from 'buffer';
@@ -7,11 +7,12 @@ global.Buffer = Buffer;
 
 const clientId = SPOTIFY_CLIENT_ID;
 const redirectUri = makeRedirectUri({ useProxy: true });
+const scopes = ['user-read-recently-played', 'user-library-read'];
 
-const scopes = [
-  'user-read-recently-played',
-  'user-library-read',
-].join(' ');
+const discovery = {
+  authorizationEndpoint: 'https://accounts.spotify.com/authorize',
+  tokenEndpoint: 'https://accounts.spotify.com/api/token',
+};
 
 // Generate code verifier (random string)
 const generateCodeVerifier = async () => {
@@ -22,7 +23,7 @@ const generateCodeVerifier = async () => {
     .replace(/\//g, '_');
 };
 
-// SHA256 hash
+// SHA256 hash for PKCE
 const sha256 = async (verifier) => {
   const hashed = await Crypto.digestStringAsync(
     Crypto.CryptoDigestAlgorithm.SHA256,
@@ -39,19 +40,23 @@ export const authenticateWithSpotify = async () => {
 
     await AsyncStorage.setItem('spotify_code_verifier', codeVerifier);
 
-    const authUrl = `https://accounts.spotify.com/authorize?` +
-      `response_type=code&` +
-      `client_id=${clientId}&` +
-      `scope=${encodeURIComponent(scopes)}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `code_challenge_method=S256&` +
-      `code_challenge=${codeChallenge}`;
+    // Build the auth request
+    const authRequest = new AuthRequest({
+      clientId,
+      scopes,
+      redirectUri,
+      codeChallenge,
+      codeChallengeMethod: 'S256',
+      responseType: 'code',
+      usePKCE: true,
+    });
 
-    const result = await startAsync({ authUrl });
+    // Load and prompt
+    await authRequest.makeAuthUrlAsync(discovery);
+    const result = await authRequest.promptAsync(discovery, { useProxy: true });
 
     if (result.type === 'success' && result.params.code) {
-      const code = result.params.code;
-      return await exchangeToken(code);
+      return await exchangeToken(result.params.code, codeVerifier);
     } else {
       throw new Error('Authentication failed or was canceled');
     }
@@ -62,28 +67,20 @@ export const authenticateWithSpotify = async () => {
   }
 };
 
-const exchangeToken = async (code) => {
-  const codeVerifier = await AsyncStorage.getItem('spotify_code_verifier');
+const exchangeToken = async (code, codeVerifier) => {
+  const tokenResponse = await exchangeCodeAsync(
+    {
+      clientId,
+      code,
+      redirectUri,
+      extraParams: { code_verifier: codeVerifier },
+    },
+    discovery
+  );
 
-  const payload = new URLSearchParams({
-    client_id: clientId,
-    grant_type: 'authorization_code',
-    code,
-    redirect_uri: redirectUri,
-    code_verifier: codeVerifier,
-  });
-
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: payload.toString(),
-  });
-
-  const tokenData = await response.json();
-
-  if (tokenData.access_token) {
-    await AsyncStorage.setItem('spotify_access_token', tokenData.access_token);
-    return tokenData;
+  if (tokenResponse.accessToken) {
+    await AsyncStorage.setItem('spotify_access_token', tokenResponse.accessToken);
+    return tokenResponse;
   } else {
     throw new Error('Token exchange failed');
   }

@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
-import { Dimensions } from 'react-native';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { authenticateWithSpotify } from '../services/spotifyAuth';
-import { Image } from 'react-native';
+import { useSpotifyAuth } from '../context/spotifyAuthContext';
 
-// Decompose the height from the window object
+// Decompose the dimensions of the window to use for styling
 const { height } = Dimensions.get('window');
 
 export default function LoginScreen() {
-  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { accessToken, setAccessToken } = useSpotifyAuth(); // Use context
 
   const handleLogin = async () => {
     try {
-    const tokenData = await authenticateWithSpotify();
-    // Now store tokenData.access_token in context
-    } catch (err) {
-      console.error('Login failed:', err);
+      setLoading(true);
+      const tokenData = await authenticateWithSpotify();
+      setAccessToken(tokenData.accessToken);
+    } catch (error) {
+      console.error('Login failed:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -30,17 +33,18 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Siftify</Text>
-      <Image source={require('../assets/siftify-icon.png')} style={styles.icon}/>
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.loginButtonText}>Login</Text>
+      <Image source={require('../assets/siftify-icon.png')} style={styles.icon} />
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+        <Text style={styles.loginButtonText}>{loading ? 'Logging in...' : 'Login'}</Text>
       </TouchableOpacity>
-      {token && <Text style={styles.token}>Logged in!</Text>}
+      {accessToken && <Text style={styles.token}>Logged in!</Text>}
       <View style={styles.footer}>
         <Text style={styles.footerText}>Developed by Alex Russell of Dalhousie University</Text>
       </View>
     </View>
   );
 }
+
 
 // Style sheet for the LoginScreen component
 const styles = StyleSheet.create({
