@@ -17,28 +17,33 @@ const discovery = {
 // Generate code verifier (random string)
 const generateCodeVerifier = async () => {
   const bytes = await Crypto.getRandomBytesAsync(64);
-  return Buffer.from(bytes).toString('base64')
+  return Buffer.from(bytes)
+    .toString('base64')
     .replace(/=/g, '')
     .replace(/\+/g, '-')
     .replace(/\//g, '_');
 };
 
-// SHA256 hash for PKCE
-const sha256 = async (verifier) => {
-  const hashed = await Crypto.digestStringAsync(
+// SHA256 hash for PKCE, base64url encoded
+const sha256 = async (plain) => {
+  const digest = await Crypto.digestStringAsync(
     Crypto.CryptoDigestAlgorithm.SHA256,
-    verifier,
+    plain,
     { encoding: Crypto.CryptoEncoding.BASE64 }
   );
-  return hashed.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  return digest.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 };
 
 export const authenticateWithSpotify = async () => {
-  try {
-    const codeVerifier = await generateCodeVerifier();
-    const codeChallenge = await sha256(codeVerifier);
+  let codeVerifier;
 
+  try {
+    codeVerifier = await generateCodeVerifier();
+    console.log('Generated code verifier:', codeVerifier);
     await AsyncStorage.setItem('spotify_code_verifier', codeVerifier);
+    console.log('Code verifier:' + codeVerifier);
+
+    const codeChallenge = await sha256(codeVerifier);
 
     // Build the auth request
     const authRequest = new AuthRequest({
@@ -51,7 +56,6 @@ export const authenticateWithSpotify = async () => {
       usePKCE: true,
     });
 
-    // Load and prompt
     await authRequest.makeAuthUrlAsync(discovery);
     const result = await authRequest.promptAsync(discovery, { useProxy: true });
 
@@ -60,7 +64,6 @@ export const authenticateWithSpotify = async () => {
     } else {
       throw new Error('Authentication failed or was canceled');
     }
-
   } catch (err) {
     console.error('Auth error:', err);
     throw err;

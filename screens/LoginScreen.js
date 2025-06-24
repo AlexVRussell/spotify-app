@@ -8,7 +8,7 @@ const { height } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
-  const { accessToken, setAccessToken } = useSpotifyAuth(); // Use context
+  const { accessToken, setAccessToken } = useSpotifyAuth();
 
   const handleLogin = async () => {
     try {
