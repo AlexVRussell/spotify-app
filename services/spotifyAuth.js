@@ -39,9 +39,8 @@ export const authenticateWithSpotify = async () => {
 
   try {
     codeVerifier = await generateCodeVerifier();
-    console.log('Generated code verifier:', codeVerifier);
     await AsyncStorage.setItem('spotify_code_verifier', codeVerifier);
-    console.log('Code verifier:' + codeVerifier);
+    console.log('Code verifier stored:', codeVerifier);
 
     const codeChallenge = await sha256(codeVerifier);
 
@@ -70,7 +69,23 @@ export const authenticateWithSpotify = async () => {
   }
 };
 
-const exchangeToken = async (code, codeVerifier) => {
+
+/**
+ * DEBBUGGING NOTE:
+ * ERROR DESCRIPTION:
+ * Login failed: [Error: The provided authorization grant 
+ * (e.g., authorization code, resource owner credentials) 
+ * or refresh token is invalid, expired, revoked, does 
+ * not match the redirection URI used in the authorization request, 
+ * or was issued to another client. More info: code_verifier was incorrect]
+ * 
+ * The 
+ */
+const exchangeToken = async code => {
+
+  const codeVerifier = await AsyncStorage.getItem('spotify_code_verifier');
+  
+  console.log('Code verifier:', codeVerifier);
   const tokenResponse = await exchangeCodeAsync(
     {
       clientId,
