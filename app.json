@@ -2,6 +2,7 @@
   "expo": {
     "name": "spotify-app",
     "slug": "spotify-app",
+    "scheme": "siftify",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/siftify-icon.png",
@@ -13,7 +14,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.spotifyapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +30,12 @@
     },
     "web": {
       "favicon": "./assets/siftify-icon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "bffd0420-bba9-46e5-a45c-fd33a44bc2d3"
+      }
+    },
+    "owner": "alex_vr"
   }
 }

@@ -7,6 +7,7 @@ global.Buffer = Buffer;
 
 const clientId = SPOTIFY_CLIENT_ID;
 const redirectUri = makeRedirectUri({ useProxy: true });
+console.log('Expo Redirect URI:', redirectUri);
 const scopes = ['user-read-recently-played', 'user-library-read'];
 
 const discovery = {
@@ -40,11 +41,9 @@ export const authenticateWithSpotify = async () => {
   try {
     codeVerifier = await generateCodeVerifier();
     await AsyncStorage.setItem('spotify_code_verifier', codeVerifier);
-    console.log('Code verifier stored:', codeVerifier);
-
+    
     const codeChallenge = await sha256(codeVerifier);
 
-    // Build the auth request
     const authRequest = new AuthRequest({
       clientId,
       scopes,
@@ -54,12 +53,12 @@ export const authenticateWithSpotify = async () => {
       responseType: 'code',
       usePKCE: true,
     });
-
+    
     await authRequest.makeAuthUrlAsync(discovery);
     const result = await authRequest.promptAsync(discovery, { useProxy: true });
 
     if (result.type === 'success' && result.params.code) {
-      return await exchangeToken(result.params.code, codeVerifier);
+      return await exchangeToken(result.params.code);
     } else {
       throw new Error('Authentication failed or was canceled');
     }
@@ -72,20 +71,27 @@ export const authenticateWithSpotify = async () => {
 
 /**
  * DEBBUGGING NOTE:
+ * ------------------------------------------------------------
+ * 
  * ERROR DESCRIPTION:
+ * ------------------------------------------------------------
  * Login failed: [Error: The provided authorization grant 
  * (e.g., authorization code, resource owner credentials) 
  * or refresh token is invalid, expired, revoked, does 
  * not match the redirection URI used in the authorization request, 
  * or was issued to another client. More info: code_verifier was incorrect]
  * 
- * The 
+ * MY FINDINGS:
+ * ------------------------------------------------------------ 
+ * The code verifier is different that we generated is different than the one we used to exchange the code.
+ * But after further testing they seem to be the same.
+ * More debugging and research into the Spotify API documentation is needed.
+ * For now I am hardcoding the redirect URI as https://auth.expo.io/@alex_vr/spotify-app
  */
 const exchangeToken = async code => {
 
   const codeVerifier = await AsyncStorage.getItem('spotify_code_verifier');
-  
-  console.log('Code verifier:', codeVerifier);
+
   const tokenResponse = await exchangeCodeAsync(
     {
       clientId,
