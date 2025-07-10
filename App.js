@@ -1,14 +1,34 @@
 import React from 'react';
-import LoginScreen from './screens/LoginScreen';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native';
-import { SpotifyAuthProvider } from './context/spotifyAuthContext';
+
+import LoginScreen from './screens/LoginScreen';
+import HomeScreen from './screens/HomeScreen';
+import { SpotifyAuthProvider, useSpotifyAuth } from './context/spotifyAuthContext';
+
+const Stack = createNativeStackNavigator();
+
+function RootNavigator() {
+  const { accessToken } = useSpotifyAuth();
+  
+  return (
+     <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {!accessToken ? (
+        <Stack.Screen name="Login" component={LoginScreen} />
+      ) : (
+        <Stack.Screen name="Home" component={HomeScreen} />
+      )}
+    </Stack.Navigator>
+  );
+}
 
 export default function App() {
   return (
     <SpotifyAuthProvider>
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#545454' }}>
-        <LoginScreen />;
-      </SafeAreaView>
-    </SpotifyAuthProvider>  
-  )
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    </SpotifyAuthProvider>
+  );
 }
