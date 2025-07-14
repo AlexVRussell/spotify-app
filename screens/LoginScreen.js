@@ -21,7 +21,7 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
-  
+
   /**
    * LoginScreen component
    * This component includes:
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   token: {
     marginTop: 20,
     fontSize: 14,
-    color: 'green',
+    color: 'white',
   },
   footer: {
     position: 'absolute',

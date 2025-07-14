@@ -9,15 +9,34 @@ export default function HomeScreen() {
       <Text style={styles.title}>Welcome to Siftify</Text>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Top Artist</Text>
-        <Text style={styles.cardContent}>[Artist Name]</Text>
+        <View style={styles.row}>
+          <View style={styles.textBlock}>
+            <Text style={styles.cardTitle}>Top Artist</Text>
+            <Text style={styles.cardContent}>[Artist Name]</Text>
+          </View>
+          <View style={styles.cardImage}>
+            <Text>ARTIST PIC</Text>
+          </View>
+        </View>
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Top Song</Text>
-        <Text style={styles.cardContent}>[Song Name]</Text>
+        <View style={styles.row}>
+          <View style={styles.textBlock}>
+            <Text style={styles.cardTitle}>Top Song</Text>
+            <Text style={styles.cardContent}>[Song Name]</Text>
+          </View>
+          <View style={styles.cardImage}>
+            <Text>SONG PIC</Text>
+          </View>
+        </View>
       </View>
 
+      {/**
+      * ---*DISCLAIMER*---
+      * Unsure if these sections are needed/formatted but will leave them here for now
+      * ---*DISCLAIMER*---
+      */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Recently Played</Text>
         <Text style={styles.cardContent}>[Track List]</Text>
@@ -33,35 +52,56 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     padding: 20,
-    paddingBottom: 40,
-    backgroundColor: '#fff',
+    backgroundColor: '#545454',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    color: 'white',
     marginBottom: 20,
     marginTop: height * 0.05,
     textAlign: 'center',
   },
   card: {
-    backgroundColor: '#f3f3f3',
+    backgroundColor: '#545454',
     borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#7ed957',
     padding: 20,
     marginBottom: 15,
-    elevation: 2, // Android shadow
-    shadowColor: '#000', // iOS shadow
+    elevation: 2,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  textBlock: {
+    flex: 1,
+    marginRight: 20,
+  },
   cardTitle: {
     fontSize: 20,
     fontWeight: '600',
-    marginBottom: 8,
+    color: 'white',
   },
   cardContent: {
     fontSize: 16,
-    color: '#555',
+    color: 'white',
+    marginTop: 4,
+  },
+  cardImage: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#ccc',
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
