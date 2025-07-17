@@ -11,11 +11,12 @@
     "splash": {
       "image": "./assets/siftify-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#545454"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.spotifyapp",
+      "backgroundColor": "#545454",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -23,7 +24,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/siftify-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#545454"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.spotifyapp"

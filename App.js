@@ -15,8 +15,8 @@ function RootNavigator() {
   return (
     // Access token check is set to true for testing purposes
     // This will allow the HomeScreen to be displayed without logging in 
-     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {accessToken ? (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {!accessToken ? (
         <Stack.Screen name="Login" component={LoginScreen} />
       ) : (
         <Stack.Screen name="Home" component={HomeScreen} />

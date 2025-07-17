@@ -8,7 +8,7 @@ global.Buffer = Buffer;
 
 const clientId = SPOTIFY_CLIENT_ID;
 const redirectUri = 'siftify://callback';
-const scopes = ['user-read-recently-played', 'user-library-read'];
+const scopes = ['user-read-recently-played', 'user-library-read', 'user-top-read'];
 
 const discovery = {
   authorizationEndpoint: 'https://accounts.spotify.com/authorize',
