@@ -38,20 +38,29 @@ class spotifyService {
     return response.json();
   }
 
-  async getTopArtists(timeRange, limit = 1) {
+  async getTopArtists(timeRange, limit = 50) {
     try {
       const data = await this.makeRequest(`/me/top/artists?time_range=${timeRange}&limit=${limit}`);
-      return data.items[0] || null;
+      if(limit == 1) {
+        return data.items[0] || null;
+      }
+      return data.items || [];
+      
     } catch (error) {
       console.error('Error fetching top artists:', error);
       return null;
     }
   }
 
-  async getTopTracks(timeRange, limit = 1) {
+  async getTopTracks(timeRange, limit = 50) {
     try {
       const data = await this.makeRequest(`/me/top/tracks?time_range=${timeRange}&limit=${limit}`);
-      return data.items[0] || null;
+      
+      if (limit == 1) {
+        return data.items[0] || null;
+      } 
+      return data.items || [];
+      
     } catch (error) {
       console.error('Error fetching top tracks:', error);
       return null;

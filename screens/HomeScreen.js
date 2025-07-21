@@ -4,19 +4,16 @@ import SpotifyService from '../services/spotifyService';
 
 const { height } = Dimensions.get('window');
 
-export default function HomeScreen() {
-
-  // Set the default time range to 'medium_term'
+export default function HomeScreen({ navigation }) {
   const [selectedTerm, setSelectedTerm] = useState('medium_term');
   const [topArtist, setTopArtist] = useState(null);
   const [topTrack, setTopTrack] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [termFooter, setTermFooter] = useState('Your listening history over the last 6 months');
+  const [termFooter, setTermFooter] = useState('Your listening history over the last 6 months'); 
 
   const spotifyService = new SpotifyService();
 
-  // Runs useEffect when we change the selected term
   useEffect(() => {
     fetchSpotifyData();
   }, [selectedTerm]);
@@ -25,15 +22,13 @@ export default function HomeScreen() {
 
   useEffect(() => {
     let timeout;
-
     if (loading) {
       timeout = setTimeout(() => {
         setTookTooLong(true);
-      }, 5000); // 5 seconds
+      }, 5000);
     } else {
       setTookTooLong(false);
     }
-
     return () => clearTimeout(timeout);
   }, [loading]);
 
@@ -42,7 +37,6 @@ export default function HomeScreen() {
       setLoading(true);
       setError(null);
 
-      // Fetch both top artist and track concurrently for better performance
       const [artistData, trackData] = await Promise.all([
         spotifyService.getTopArtists(selectedTerm, 1),
         spotifyService.getTopTracks(selectedTerm, 1)
@@ -58,13 +52,25 @@ export default function HomeScreen() {
     }
   };
 
+  const navigateToTopArtists = () => {
+    navigation.navigate('TopArtistsScreen', {
+      initialTerm: selectedTerm
+    });
+  };
+
+  const navigateToTopTracks = () => {
+    navigation.navigate('TopTracksScreen', {
+      initialTerm: selectedTerm
+    });
+  };
+
   if (loading) {
     return (
       <View style={[styles.root, styles.centerContent]}>
         <ActivityIndicator size="large" color="#7ed957" />
         {tookTooLong ? (
           <>
-            <Text style={styles.loadingText}>Still waiting? Probably a HTTP 502 🙃</Text>
+            <Text style={styles.loadingText}>Still waiting? Probably a HTTP 502 :|</Text>
             <Text style={styles.loadingText}>Spotify's taking their sweet time...</Text>
           </>
         ) : (
@@ -91,63 +97,65 @@ export default function HomeScreen() {
       >
         <Text style={styles.title}>Siftify</Text>
         
-        <View style={styles.card}>
-          <View style={styles.row}>
-            <View style={styles.textBlock}>
-              <Text style={styles.cardTitle}>Top Artist</Text>
-              <Text style={styles.cardContent}>
-                {topArtist ? topArtist.name : 'No artist data available'}
-              </Text>
-              {topArtist && topArtist.genres && topArtist.genres.length > 0 && (
-                <Text style={styles.cardSubtext}>
-                  {topArtist.genres.slice(0, 2).join(', ')}
+        <TouchableOpacity onPress={navigateToTopArtists}>
+          <View style={styles.card}>
+            <View style={styles.row}>
+              <View style={styles.textBlock}>
+                <Text style={styles.cardTitle}>Top Artist</Text>
+                <Text style={styles.cardContent}>
+                  {topArtist ? topArtist.name : 'No artist data available'}
                 </Text>
-              )}
-            </View>
-            <View style={styles.cardImage}>
-              {topArtist && topArtist.images && topArtist.images.length > 0 ? (
-                <Image 
-                  source={{ uri: topArtist.images[0].url }}
-                  style={styles.imageStyle}
-                  resizeMode="cover"
-                />
-              ) : (
-                <Text style={styles.placeholderText}>ARTIST PIC</Text>
-              )}
+                {topArtist && topArtist.genres && topArtist.genres.length > 0 && (
+                  <Text style={styles.cardSubtext}>
+                    {topArtist.genres.slice(0, 2).join(', ')}
+                  </Text>
+                )}
+                <Text style={styles.tapHint}>Tap to see top 50</Text>
+              </View>
+              <View style={styles.cardImage}>
+                {topArtist && topArtist.images && topArtist.images.length > 0 ? (
+                  <Image 
+                    source={{ uri: topArtist.images[0].url }}
+                    style={styles.imageStyle}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Text style={styles.placeholderText}>ARTIST PIC</Text>
+                )}
+              </View>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.card}>
-          <View style={styles.row}>
-            <View style={styles.textBlock}>
-              <Text style={styles.cardTitle}>Top Song</Text>
-              <Text style={styles.cardContent}>
-                {topTrack ? topTrack.name : 'No track data available'}
-              </Text>
-              {topTrack && topTrack.artists && topTrack.artists.length > 0 && (
-                <Text style={styles.cardSubtext}>
-                  by {topTrack.artists[0].name}
+        <TouchableOpacity onPress={navigateToTopTracks}>
+          <View style={styles.card}>
+            <View style={styles.row}>
+              <View style={styles.textBlock}>
+                <Text style={styles.cardTitle}>Top Song</Text>
+                <Text style={styles.cardContent}>
+                  {topTrack ? topTrack.name : 'No track data available'}
                 </Text>
-              )}
-            </View>
-            <View style={styles.cardImage}>
-              {topTrack && topTrack.album && topTrack.album.images && topTrack.album.images.length > 0 ? (
-                <Image 
-                  source={{ uri: topTrack.album.images[0].url }}
-                  style={styles.imageStyle}
-                  resizeMode="cover"
-                />
-              ) : (
-                <Text style={styles.placeholderText}>SONG PIC</Text>
-              )}
+                {topTrack && topTrack.artists && topTrack.artists.length > 0 && (
+                  <Text style={styles.cardSubtext}>
+                    by {topTrack.artists[0].name}
+                  </Text>
+                )}
+                <Text style={styles.tapHint}>Tap to see top 50</Text>
+              </View>
+              <View style={styles.cardImage}>
+                {topTrack && topTrack.album && topTrack.album.images && topTrack.album.images.length > 0 ? (
+                  <Image 
+                    source={{ uri: topTrack.album.images[0].url }}
+                    style={styles.imageStyle}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Text style={styles.placeholderText}>SONG PIC</Text>
+                )}
+              </View>
             </View>
           </View>
-        </View>
-
-        {/* ---*DISCLAIMER*---
-            Unsure if these sections are needed/formatted but will leave them here for now
-            ---*DISCLAIMER*--- */}
+        </TouchableOpacity>
 
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Recently Played</Text>
@@ -162,7 +170,10 @@ export default function HomeScreen() {
         <View style={styles.termRow}>
           <TouchableOpacity
             style={[styles.termButton, selectedTerm === 'short_term' && styles.selectedTerm]}
-            onPress={() => { setSelectedTerm('short_term'); setTermFooter('Your listening history over the last 4 weeks'); }}
+            onPress={() => { 
+              setSelectedTerm('short_term'); 
+              setTermFooter('Your listening history over the last 4 weeks'); 
+            }}
           >
             <Text style={[styles.cardContent, selectedTerm === 'short_term' && styles.selectedText]}>
               4 Weeks
@@ -171,7 +182,10 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={[styles.termButton, selectedTerm === 'medium_term' && styles.selectedTerm]}
-            onPress={() => { setSelectedTerm('medium_term'); setTermFooter('Your listening history over the last 6 months'); }}
+            onPress={() => { 
+              setSelectedTerm('medium_term'); 
+              setTermFooter('Your listening history over the last 6 months'); 
+            }}
           >
             <Text style={[styles.cardContent, selectedTerm === 'medium_term' && styles.selectedText]}>
               6 Months
@@ -180,7 +194,10 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={[styles.termButton, selectedTerm === 'long_term' && styles.selectedTerm]}
-            onPress={() => { setSelectedTerm('long_term'); setTermFooter('Really? This is your all time favourite?');}}
+            onPress={() => { 
+              setSelectedTerm('long_term'); 
+              setTermFooter('Really? This is your all time favourite?');
+            }}
           >
             <Text style={[styles.cardContent, selectedTerm === 'long_term' && styles.selectedText]}>
               All Time
@@ -240,17 +257,17 @@ const styles = StyleSheet.create({
   },
   
   card: {
-    backgroundColor: '#545454',
+    backgroundColor: '#6d6b6bff',
     borderRadius: 10,
     borderWidth: 2,
     borderColor: '#7ed957',
     padding: 20,
     marginBottom: 15,
     elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 10, height: 5 },
+    shadowOpacity: 0.5,
     shadowRadius: 4,
+    shadowColor:  '#272525ff',
   },
   
   row: {
@@ -283,6 +300,13 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
+  tapHint: {
+    fontSize: 12,
+    color: '#7ed957',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+
   cardImage: {
     width: 80,
     height: 80,
@@ -304,6 +328,7 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
   },
+  
   termButton: {
     flex: 1,
     paddingVertical: 8,
@@ -314,19 +339,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  
   selectedTerm: {
     backgroundColor: '#1DB954',
   },
+  
   selectedText: {
     color: 'white',
     fontWeight: 'bold',
   },
+  
   termRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 20,
     marginBottom: 20,
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    shadowColor:  '#272525ff',
   },
+  
   termFooter: {
     color: 'white',
     fontSize: 16,

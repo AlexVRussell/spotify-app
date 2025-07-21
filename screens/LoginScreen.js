@@ -22,14 +22,6 @@ export default function LoginScreen() {
     }
   };
 
-  /**
-   * LoginScreen component
-   * This component includes:
-   * - The app title
-   * - An icon image
-   * - A login button that triggers Spotify authentication
-   * - The footer with developer information
-   */
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Siftify</Text>
@@ -45,8 +37,6 @@ export default function LoginScreen() {
   );
 }
 
-
-// Style sheet for the LoginScreen component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
