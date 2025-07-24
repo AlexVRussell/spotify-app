@@ -86,6 +86,69 @@ class spotifyService {
       return [];
     }
   }
+
+  async unlikeTrack(trackId) {
+    const token = await this.getAccessToken();
+    const response = await fetch(`${this.baseURL}/me/tracks?ids=${trackId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to unlike track: ${response.status}`);
+    }
+  }
+
+  async removeTrackFromPlaylist(playlistId, trackUri) {
+    const token = await this.getAccessToken();
+    const response = await fetch(`${this.baseURL}/playlists/${playlistId}/tracks`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        tracks: [{ uri: trackUri }],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to remove track: ${response.status}`);
+    }
+  }
+
+  async getPlaylistTracks(playlistId, limit = 50) {
+    const data = await this.makeRequest(`/playlists/${playlistId}/tracks?limit=${limit}`);
+    return data.items;
+  }
+
+  async getUserPlaylists(limit = 20) {
+    const data = await this.makeRequest(`/me/playlists?limit=${limit}`);
+    return data.items;
+  }
+
+  async getUserProfile() {
+    try {
+      const data = await this.makeRequest(`/me`);
+      return data;
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      return null;
+    }
+  }
+
+  // To get total saved tracks count:
+  async getSavedTracksCount() {
+    try {
+      const data = await this.makeRequest(`/me/tracks?limit=1`);
+      return data.total || 0;
+    } catch (error) {
+      console.error('Error fetching saved tracks count:', error);
+      return 0;
+    }
+  }
 }
 
 export default spotifyService;

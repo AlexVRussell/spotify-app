@@ -10,6 +10,9 @@ export default function HomeScreen({ navigation }) {
   const [topTrack, setTopTrack] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [libraryCount, setLibraryCount] = useState(0);
+  const [playlistCount, setPlaylistCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
   const [termFooter, setTermFooter] = useState('Your listening history over the last 6 months'); 
 
   const spotifyService = new SpotifyService();
@@ -37,9 +40,18 @@ export default function HomeScreen({ navigation }) {
       setLoading(true);
       setError(null);
 
-      const [artistData, trackData] = await Promise.all([
+      const [
+        artistData,
+        trackData,
+        savedTracks,
+        playlists,
+        userProfile
+      ] = await Promise.all([
         spotifyService.getTopArtists(selectedTerm, 1),
-        spotifyService.getTopTracks(selectedTerm, 1)
+        spotifyService.getTopTracks(selectedTerm, 1),
+        spotifyService.getSavedTracks(1),
+        spotifyService.getUserPlaylists(),  
+        spotifyService.getUserProfile()
       ]);
 
       setTopArtist(artistData);
@@ -50,18 +62,6 @@ export default function HomeScreen({ navigation }) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const navigateToTopArtists = () => {
-    navigation.navigate('TopArtistsScreen', {
-      initialTerm: selectedTerm
-    });
-  };
-
-  const navigateToTopTracks = () => {
-    navigation.navigate('TopTracksScreen', {
-      initialTerm: selectedTerm
-    });
   };
 
   if (loading) {
@@ -97,7 +97,7 @@ export default function HomeScreen({ navigation }) {
       >
         <Text style={styles.title}>Siftify</Text>
         
-        <TouchableOpacity onPress={navigateToTopArtists}>
+        <TouchableOpacity onPress={() => navigation.navigate('TopArtistsScreen', { initialTerm: selectedTerm })}>
           <View style={styles.card}>
             <View style={styles.row}>
               <View style={styles.textBlock}>
@@ -127,7 +127,7 @@ export default function HomeScreen({ navigation }) {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={navigateToTopTracks}>
+        <TouchableOpacity onPress={() => navigation.navigate('TopTracksScreen', { initialTerm: selectedTerm })}>
           <View style={styles.card}>
             <View style={styles.row}>
               <View style={styles.textBlock}>
@@ -158,13 +158,21 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recently Played</Text>
-          <Text style={styles.cardContent}>[Track List]</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Your Library</Text>
-          <Text style={styles.cardContent}>[Saved Albums/Tracks]</Text>
+          <Text style={styles.statsTitle}>Music Stats</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statBlock}>
+              <Text style={styles.statNumber}>{libraryCount}</Text>
+              <Text style={styles.statLabel}>Saved</Text>
+            </View>
+            <View style={styles.statBlock}>
+              <Text style={styles.statNumber}>{playlistCount}</Text>
+              <Text style={styles.statLabel}>Playlists</Text>
+            </View>
+            <View style={styles.statBlock}>
+              <Text style={styles.statNumber}>{followersCount}</Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </View>
+          </View>
         </View>
 
         <View style={styles.termRow}>
@@ -205,6 +213,8 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         <Text style={styles.termFooter}>{termFooter}</Text>
+        
+        <View style={{ height: 20 }} />
       </ScrollView>
     </View>
   );
@@ -215,7 +225,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#545454',
   },
-  
+
   container: {
     flexGrow: 1,
     padding: 20,
@@ -246,7 +256,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 5,
   },
-  
+
   title: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -255,7 +265,7 @@ const styles = StyleSheet.create({
     marginTop: height * 0.05,
     textAlign: 'center',
   },
-  
+
   card: {
     backgroundColor: '#6d6b6bff',
     borderRadius: 10,
@@ -267,26 +277,26 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 10, height: 5 },
     shadowOpacity: 0.5,
     shadowRadius: 4,
-    shadowColor:  '#272525ff',
+    shadowColor: '#272525ff',
   },
-  
+
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  
+
   textBlock: {
     flex: 1,
     marginRight: 20,
   },
-  
+
   cardTitle: {
     fontSize: 20,
     fontWeight: '600',
     color: 'white',
   },
-  
+
   cardContent: {
     fontSize: 16,
     color: 'white',
@@ -323,12 +333,35 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 
-  placeholderText: {
-    fontSize: 12,
-    color: '#666',
+  statsTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: 'white',
     textAlign: 'center',
+    marginBottom: 12,
   },
-  
+
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+
+  statBlock: {
+    alignItems: 'center',
+  },
+
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#7ed957',
+  },
+
+  statLabel: {
+    fontSize: 14,
+    color: '#fff',
+    marginTop: 4,
+  },
+
   termButton: {
     flex: 1,
     paddingVertical: 8,
@@ -339,16 +372,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   selectedTerm: {
     backgroundColor: '#1DB954',
   },
-  
+
   selectedText: {
     color: 'white',
     fontWeight: 'bold',
   },
-  
+
   termRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -357,9 +390,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 5, height: 5 },
     shadowOpacity: 0.5,
     shadowRadius: 4,
-    shadowColor:  '#272525ff',
+    shadowColor: '#272525ff',
   },
-  
+
   termFooter: {
     color: 'white',
     fontSize: 16,
