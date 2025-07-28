@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  ActivityIndicator, 
-  TouchableOpacity, 
-  Image, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+  Image,
   Dimensions,
   Animated,
   PanResponder
@@ -27,26 +27,28 @@ export default function SiftAwayScreen() {
 
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return Math.abs(gestureState.dx) > 20 || Math.abs(gestureState.dy) > 20;
-      },
+      onMoveShouldSetPanResponder: (evt, gestureState) =>
+        Math.abs(gestureState.dx) > 20 || Math.abs(gestureState.dy) > 20,
+
       onPanResponderGrant: () => {
-        translateX.setOffset(translateX._value);
-        translateY.setOffset(translateY._value);
+        translateX.stopAnimation();
+        translateY.stopAnimation();
+        rotate.stopAnimation();
+        translateX.setValue(0);
+        translateY.setValue(0);
+        rotate.setValue(0);
       },
+
       onPanResponderMove: (evt, gestureState) => {
         translateX.setValue(gestureState.dx);
         translateY.setValue(gestureState.dy);
         rotate.setValue(gestureState.dx);
       },
+
       onPanResponderRelease: (evt, gestureState) => {
-        translateX.flattenOffset();
-        translateY.flattenOffset();
-        
         if (Math.abs(gestureState.dx) > 120) {
-          // Swipe detected
           const direction = gestureState.dx > 0 ? 'right' : 'left';
-          
+
           Animated.timing(translateX, {
             toValue: direction === 'right' ? 500 : -500,
             duration: 300,
@@ -57,15 +59,12 @@ export default function SiftAwayScreen() {
             } else {
               console.log('Would keep:', tracks[currentIndex]?.name);
             }
-            
-            // Reset and move to next card
             translateX.setValue(0);
             translateY.setValue(0);
             rotate.setValue(0);
             setCurrentIndex(prev => prev + 1);
           });
         } else {
-          // Snap back
           Animated.spring(translateX, {
             toValue: 0,
             useNativeDriver: true,
@@ -112,14 +111,13 @@ export default function SiftAwayScreen() {
         const playlistItems = await spotifyService.getPlaylistTracks(selectedPlaylist.id, 50);
         loadedTracks = playlistItems.map(item => item.track);
       }
-      
-      const validTracks = loadedTracks.filter(track => 
+
+      const validTracks = loadedTracks.filter(track =>
         track && track.id && track.name && track.artists && track.artists.length > 0
       );
-      
+
       setTracks(validTracks);
       setCurrentIndex(0);
-      // Reset animations when new tracks load
       translateX.setValue(0);
       translateY.setValue(0);
       rotate.setValue(0);
@@ -131,56 +129,12 @@ export default function SiftAwayScreen() {
     }
   };
 
-  const onGestureEvent = Animated.event(
-    [{ nativeEvent: { translationX: translateX, translationY: translateY } }],
-    { useNativeDriver: true }
-  );
-
-  const onHandlerStateChange = (event) => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      const { translationX } = event.nativeEvent;
-      
-      if (Math.abs(translationX) > 120) {
-        // Swipe detected
-        const direction = translationX > 0 ? 'right' : 'left';
-        
-        Animated.timing(translateXAnimated, {
-          toValue: direction === 'right' ? 500 : -500,
-          duration: 300,
-          useNativeDriver: true,
-        }).start(() => {
-          if (direction === 'left') {
-            console.log('Would remove:', tracks[currentIndex]?.name);
-          } else {
-            console.log('Would keep:', tracks[currentIndex]?.name);
-          }
-          
-          // Reset and move to next card
-          translateX.setValue(0);
-          translateY.setValue(0);
-          setCurrentIndex(prev => prev + 1);
-        });
-      } else {
-        // Snap back
-        Animated.spring(translateX, {
-          toValue: 0,
-          useNativeDriver: true,
-        }).start();
-        Animated.spring(translateY, {
-          toValue: 0,
-          useNativeDriver: true,
-        }).start();
-      }
-    }
-  };
-
   const handleButtonSwipe = (direction) => {
     if (direction === 'left') {
       console.log('Would remove:', tracks[currentIndex]?.name);
     } else {
       console.log('Would keep:', tracks[currentIndex]?.name);
     }
-    // Reset animations and move to next card
     translateX.setValue(0);
     translateY.setValue(0);
     rotate.setValue(0);
@@ -232,7 +186,8 @@ export default function SiftAwayScreen() {
                 transform: [
                   { translateX },
                   { translateY },
-                  { rotate: rotate.interpolate({
+                  {
+                    rotate: rotate.interpolate({
                       inputRange: [-200, 0, 200],
                       outputRange: ['-30deg', '0deg', '30deg']
                     })
@@ -241,23 +196,23 @@ export default function SiftAwayScreen() {
               }
             ]}
           >
-              {currentTrack.album?.images?.[0]?.url ? (
-                <Image
-                  source={{ uri: currentTrack.album.images[0].url }}
-                  style={styles.albumArt}
-                />
-              ) : (
-                <View style={styles.noImageContainer}>
-                  <Text style={styles.noImageText}>No Image</Text>
-                </View>
-              )}
-              <Text style={styles.trackName} numberOfLines={2}>
-                {currentTrack.name}
-              </Text>
-              <Text style={styles.artistName} numberOfLines={1}>
-                {currentTrack.artists?.[0]?.name}
-              </Text>
-            </Animated.View>
+            {currentTrack.album?.images?.[0]?.url ? (
+              <Image
+                source={{ uri: currentTrack.album.images[0].url }}
+                style={styles.albumArt}
+              />
+            ) : (
+              <View style={styles.noImageContainer}>
+                <Text style={styles.noImageText}>No Image</Text>
+              </View>
+            )}
+            <Text style={styles.trackName} numberOfLines={2}>
+              {currentTrack.name}
+            </Text>
+            <Text style={styles.artistName} numberOfLines={1}>
+              {currentTrack.artists?.[0]?.name}
+            </Text>
+          </Animated.View>
         ) : (
           <Text style={styles.noTracks}>
             {tracks.length === 0 ? 'No tracks found in this playlist.' : 'All songs reviewed!'}
@@ -268,13 +223,13 @@ export default function SiftAwayScreen() {
       {/* Action Buttons */}
       {currentTrack && currentIndex < tracks.length && (
         <View style={styles.buttonRow}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.removeButton}
             onPress={() => handleButtonSwipe('left')}
           >
             <Text style={styles.buttonText}>Remove</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.keepButton}
             onPress={() => handleButtonSwipe('right')}
           >

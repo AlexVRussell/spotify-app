@@ -8,6 +8,7 @@ import HomeScreen from './screens/HomeScreen';
 import SiftAwayScreen from './screens/SiftAwayScreen';
 import TopArtistsScreen from './screens/TopArtistsScreen';
 import TopTracksScreen from './screens/TopTracksScreen';
+import AccountScreen from './screens/AccountScreen';
 
 import { SpotifyAuthProvider, useSpotifyAuth } from './context/spotifyAuthContext';
 import { Image } from 'react-native';
@@ -25,6 +26,13 @@ const HomeIcon = () => (
 const SiftIcon = () => (
   <Image
     source={require("./assets/siftify-icon.png")}
+    style={{ width: 28, height: 28, tintColor: 'white', marginBottom: 5,}}
+  />
+);
+
+const AccountIcon = () => (
+  <Image
+    source={require("./assets/account-icon.png")}
     style={{ width: 28, height: 28, tintColor: 'white', marginBottom: 5,}}
   />
 );
@@ -71,6 +79,14 @@ function MainTabNavigator() {
           tabBarIcon: SiftIcon,
           title: 'Sift Away',
           tabBarLabel: 'Sift Away',
+        }}
+      />
+      <Tab.Screen 
+        name="Account" 
+        component={AccountScreen}
+        options={{
+          tabBarIcon: AccountIcon,
+          headerShown: false,
         }}
       />
     </Tab.Navigator>
