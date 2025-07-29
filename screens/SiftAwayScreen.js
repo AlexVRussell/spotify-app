@@ -102,33 +102,34 @@ export default function SiftAwayScreen() {
   };
 
   const loadTracks = async () => {
-    setLoading(true);
-    try {
-      let loadedTracks = [];
-      if (selectedPlaylist.id === 'liked') {
-        loadedTracks = await spotifyService.getSavedTracks(50);
-      } else {
-        const playlistItems = await spotifyService.getPlaylistTracks(selectedPlaylist.id, 50);
-        loadedTracks = playlistItems.map(item => item.track);
-      }
-
-      const validTracks = loadedTracks.filter(track =>
-        track && track.id && track.name && track.artists && track.artists.length > 0
-      );
-
-      setTracks(validTracks);
-      setCurrentIndex(0);
-      translateX.setValue(0);
-      translateY.setValue(0);
-      rotate.setValue(0);
-    } catch (err) {
-      console.error('Error loading tracks:', err);
-      setTracks([]);
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    let loadedTracks = [];
+    if (selectedPlaylist.id === 'liked') {
+      const savedItems = await spotifyService.getSavedTracks(50);
+      // Extract track data from saved tracks response
+      loadedTracks = savedItems.map(item => item.track);
+    } else {
+      const playlistItems = await spotifyService.getPlaylistTracks(selectedPlaylist.id, 50);
+      loadedTracks = playlistItems.map(item => item.track);
     }
-  };
 
+    const validTracks = loadedTracks.filter(track =>
+      track && track.id && track.name && track.artists && track.artists.length > 0
+    );
+
+    setTracks(validTracks);
+    setCurrentIndex(0);
+    translateX.setValue(0);
+    translateY.setValue(0);
+    rotate.setValue(0);
+  } catch (err) {
+    console.error('Error loading tracks:', err);
+    setTracks([]);
+  } finally {
+    setLoading(false);
+  }
+};
   const handleButtonSwipe = (direction) => {
     if (direction === 'left') {
       console.log('Would remove:', tracks[currentIndex]?.name);
@@ -154,7 +155,8 @@ export default function SiftAwayScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Playlist Selector */}
+      
+      {/* Playlist Selection */}
       <View style={styles.playlistRow}>
         {playlists.map(pl => (
           <TouchableOpacity

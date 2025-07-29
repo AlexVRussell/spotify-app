@@ -77,9 +77,9 @@ class spotifyService {
     }
   }
 
-  async getSavedTracks(limit = 10) {
+  async getSavedTracks(limit = 50, offset = 0) {
     try {
-      const data = await this.makeRequest(`/me/tracks?limit=${limit}`);
+      const data = await this.makeRequest(`/me/tracks?limit=${limit}&offset=${offset}`);
       return data.items;
     } catch (error) {
       console.error('Error fetching saved tracks:', error);
@@ -119,8 +119,8 @@ class spotifyService {
     }
   }
 
-  async getPlaylistTracks(playlistId, limit = 50) {
-    const data = await this.makeRequest(`/playlists/${playlistId}/tracks?limit=${limit}`);
+  async getPlaylistTracks(playlistId, limit = 50, offset = 0) {
+    const data = await this.makeRequest(`/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`);
     return data.items;
   }
 
@@ -139,7 +139,6 @@ class spotifyService {
     }
   }
 
-  // To get total saved tracks count:
   async getSavedTracksCount() {
     try {
       const data = await this.makeRequest(`/me/tracks?limit=1`);
