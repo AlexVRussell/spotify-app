@@ -45,7 +45,7 @@ function MainTabNavigator() {
           backgroundColor: '#272525',
           borderTopColor: '#7ed957',
           borderTopWidth: 2,
-          height: 70,
+          height: 95,
           paddingBottom: 10,
           paddingTop: 10,
         },
@@ -54,13 +54,6 @@ function MainTabNavigator() {
         tabBarLabelStyle: {
           fontSize: 14,
           fontWeight: '600',
-        },
-        headerStyle: {
-          backgroundColor: '#545454',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
         },
       }}
     >
@@ -77,8 +70,7 @@ function MainTabNavigator() {
         component={SiftAwayScreen}
         options={{
           tabBarIcon: SiftIcon,
-          title: 'Sift Away',
-          tabBarLabel: 'Sift Away',
+          headerShown: false,
         }}
       />
       <Tab.Screen 

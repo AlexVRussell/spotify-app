@@ -144,14 +144,14 @@ export default function SiftAwayScreen() {
 
   const currentTrack = tracks[currentIndex];
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#1DB954" />
-        <Text style={styles.loadingText}>Loading playlist songs...</Text>
-      </View>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <View style={styles.center}>
+  //       <ActivityIndicator size="large" color="#1DB954" />
+  //       <Text style={styles.loadingText}>Loading playlist songs...</Text>
+  //     </View>
+  //   );
+  // }
 
   return (
     <View style={styles.container}>
