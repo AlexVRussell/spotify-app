@@ -20,6 +20,13 @@ export default function SiftAwayScreen() {
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [totalTracks, setTotalTracks] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const processedTracks = useRef(new Set());
+  
+  const BATCH_SIZE = 25;
+  const PRELOAD_THRESHOLD = 5;
 
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
@@ -89,8 +96,16 @@ export default function SiftAwayScreen() {
   }, []);
 
   useEffect(() => {
-    loadTracks();
+    loadInitialTracks();
   }, [selectedPlaylist]);
+
+  // Check if we need to load more tracks
+  useEffect(() => {
+    const remainingTracks = tracks.length - currentIndex;
+    if (remainingTracks <= PRELOAD_THRESHOLD && !isLoadingMore && currentIndex > 0) {
+      loadMoreTracks();
+    }
+  }, [currentIndex, tracks.length]);
 
   const loadPlaylists = async () => {
     try {
@@ -101,61 +116,144 @@ export default function SiftAwayScreen() {
     }
   };
 
-  const loadTracks = async () => {
-  setLoading(true);
-  try {
-    let loadedTracks = [];
-    if (selectedPlaylist.id === 'liked') {
-      const savedItems = await spotifyService.getSavedTracks(50);
-      // Extract track data from saved tracks response
-      loadedTracks = savedItems.map(item => item.track);
-    } else {
-      const playlistItems = await spotifyService.getPlaylistTracks(selectedPlaylist.id, 50);
-      loadedTracks = playlistItems.map(item => item.track);
-    }
-
-    const validTracks = loadedTracks.filter(track =>
-      track && track.id && track.name && track.artists && track.artists.length > 0
-    );
-
-    setTracks(validTracks);
+  const loadInitialTracks = async () => {
+    setLoading(true);
     setCurrentIndex(0);
-    translateX.setValue(0);
-    translateY.setValue(0);
-    rotate.setValue(0);
-  } catch (err) {
-    console.error('Error loading tracks:', err);
     setTracks([]);
-  } finally {
-    setLoading(false);
-  }
-};
-  const handleButtonSwipe = (direction) => {
-    if (direction === 'left') {
-      console.log('Would remove:', tracks[currentIndex]?.name);
-    } else {
-      console.log('Would keep:', tracks[currentIndex]?.name);
+    processedTracks.current.clear();
+    
+    try {
+      await loadTracksFromOffset(0, true);
+    } catch (err) {
+      console.error('Error loading initial tracks:', err);
+      setTracks([]);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const loadMoreTracks = async () => {
+    if (isLoadingMore || tracks.length >= totalTracks) return;
+    
+    setIsLoadingMore(true);
+    try {
+      await loadTracksFromOffset(tracks.length, false);
+    } catch (err) {
+      console.error('Error loading more tracks:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  const loadTracksFromOffset = async (offset, isInitial = false) => {
+    try {
+      let loadedTracks = [];
+      let total = 0;
+
+      if (selectedPlaylist.id === 'liked') {
+        if (isInitial) {
+          const countData = await spotifyService.getSavedTracksCount();
+          total = countData;
+          setTotalTracks(total);
+        }
+        
+        const savedItems = await spotifyService.getSavedTracks(BATCH_SIZE, offset);
+        loadedTracks = savedItems.map(item => item.track);
+      } else {
+        const playlistItems = await spotifyService.getPlaylistTracks(
+          selectedPlaylist.id, 
+          BATCH_SIZE, 
+          offset
+        );
+        
+        if (isInitial && playlistItems.length > 0) {
+          const fullPlaylistData = await spotifyService.makeRequest(
+            `/playlists/${selectedPlaylist.id}?fields=tracks(total)`
+          );
+          total = fullPlaylistData.tracks?.total || playlistItems.length;
+          setTotalTracks(total);
+        }
+        
+        loadedTracks = playlistItems.map(item => item.track);
+      }
+
+      const validTracks = loadedTracks.filter(track =>
+        track && 
+        track.id && 
+        track.name && 
+        track.artists && 
+        track.artists.length > 0 &&
+        !processedTracks.current.has(track.id)
+      ); 
+
+      validTracks.forEach(track => processedTracks.current.add(track.id));
+
+      if (isInitial) {
+        setTracks(validTracks);
+      } else {
+        setTracks(prev => [...prev, ...validTracks]);
+      }
+
+      // Reset animation values
+      translateX.setValue(0);
+      translateY.setValue(0);
+      rotate.setValue(0);
+
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleSwipe = async (direction) => {
+    const currentTrack = tracks[currentIndex];
+    if (!currentTrack) return;
+
+    if (direction === 'left') {
+      console.log('Would remove:', currentTrack.name);
+      // Where we would actually remove the track
+      // await removeTrack(currentTrack);
+    } else {
+      console.log('Would keep:', currentTrack.name);
+    }
+
+    // Reset animation
     translateX.setValue(0);
     translateY.setValue(0);
     rotate.setValue(0);
     setCurrentIndex(prev => prev + 1);
   };
 
-  const currentTrack = tracks[currentIndex];
+  const handleButtonSwipe = (direction) => {
+    handleSwipe(direction);
+  };
 
-  // if (loading) {
-  //   return (
-  //     <View style={styles.center}>
-  //       <ActivityIndicator size="large" color="#1DB954" />
-  //       <Text style={styles.loadingText}>Loading playlist songs...</Text>
-  //     </View>
-  //   );
-  // }
+  // Optional: Remove track from playlist/liked songs
+  const removeTrack = async (track) => {
+    try {
+      if (selectedPlaylist.id === 'liked') {
+        await spotifyService.unlikeTrack(track.id);
+      } else {
+        await spotifyService.removeTrackFromPlaylist(selectedPlaylist.id, track.uri);
+      }
+    } catch (error) {
+      console.error('Error removing track:', error);
+    }
+  };
+
+  const currentTrack = tracks[currentIndex];
+  const hasMoreTracks = currentIndex < tracks.length;
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#1DB954" />
+        <Text style={styles.loadingText}>Loading playlist songs...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      
       {/* Playlist Selection */}
       <View style={styles.playlistRow}>
         {playlists.map(pl => (
@@ -179,7 +277,7 @@ export default function SiftAwayScreen() {
 
       {/* Card Display */}
       <View style={styles.cardContainer}>
-        {currentTrack && currentIndex < tracks.length ? (
+        {currentTrack && hasMoreTracks ? (
           <Animated.View
             {...panResponder.panHandlers}
             style={[
@@ -217,13 +315,21 @@ export default function SiftAwayScreen() {
           </Animated.View>
         ) : (
           <Text style={styles.noTracks}>
-            {tracks.length === 0 ? 'No tracks found in this playlist.' : 'All songs reviewed!'}
+            {totalTracks === 0 ? 'No tracks found in this playlist.' : 'All songs reviewed!'}
           </Text>
+        )}
+        
+        {/* Loading indicator for more tracks */}
+        {isLoadingMore && (
+          <View style={styles.loadingMoreContainer}>
+            <ActivityIndicator size="small" color="#1DB954" />
+            <Text style={styles.loadingMoreText}>Loading more songs...</Text>
+          </View>
         )}
       </View>
 
       {/* Action Buttons */}
-      {currentTrack && currentIndex < tracks.length && (
+      {currentTrack && hasMoreTracks && (
         <View style={styles.buttonRow}>
           <TouchableOpacity
             style={styles.removeButton}
@@ -241,7 +347,8 @@ export default function SiftAwayScreen() {
       )}
 
       <Text style={styles.progressText}>
-        {currentIndex + 1} / {tracks.length}
+        {Math.min(currentIndex + 1, totalTracks)} / {totalTracks}
+        {tracks.length < totalTracks && ` (${tracks.length} loaded)`}
       </Text>
     </View>
   );
@@ -262,6 +369,16 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#fff',
     marginTop: 10,
+  },
+  loadingMoreContainer: {
+    position: 'absolute',
+    bottom: 20,
+    alignItems: 'center',
+  },
+  loadingMoreText: {
+    color: '#bbb',
+    marginTop: 5,
+    fontSize: 12,
   },
   playlistRow: {
     flexDirection: 'row',

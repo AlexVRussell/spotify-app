@@ -87,6 +87,49 @@ class spotifyService {
     }
   }
 
+  async getSavedTracksCount() {
+    try {
+      const data = await this.makeRequest(`/me/tracks?limit=1`);
+      return data.total || 0;
+    } catch (error) {
+      console.error('Error fetching saved tracks count:', error);
+      return 0;
+    }
+  }
+
+  async getPlaylistTrackCount(playlistId) {
+    try {
+      const data = await this.makeRequest(`/playlists/${playlistId}?fields=tracks(total)`);
+      return data.tracks?.total || 0;
+    } catch (error) {
+      console.error('Error fetching playlist track count:', error);
+      return 0;
+    }
+  }
+
+  async getPlaylistTracksWithTotal(playlistId, limit = 50, offset = 0) {
+    try {
+      const data = await this.makeRequest(`/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`);
+      return {
+        items: data.items,
+        total: data.total || 0
+      };
+    } catch (error) {
+      console.error('Error fetching playlist tracks with total:', error);
+      return { items: [], total: 0 };
+    }
+  }
+
+  async getPlaylistTracks(playlistId, limit = 50, offset = 0) {
+    try {
+      const data = await this.makeRequest(`/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`);
+      return data.items;
+    } catch (error) {
+      console.error('Error fetching playlist tracks:', error);
+      return [];
+    }
+  }
+
   async unlikeTrack(trackId) {
     const token = await this.getAccessToken();
     const response = await fetch(`${this.baseURL}/me/tracks?ids=${trackId}`, {
@@ -119,11 +162,6 @@ class spotifyService {
     }
   }
 
-  async getPlaylistTracks(playlistId, limit = 50, offset = 0) {
-    const data = await this.makeRequest(`/playlists/${playlistId}/tracks?limit=${limit}&offset=${offset}`);
-    return data.items;
-  }
-
   async getUserPlaylists(limit = 20) {
     const data = await this.makeRequest(`/me/playlists?limit=${limit}`);
     return data.items;
@@ -136,16 +174,6 @@ class spotifyService {
     } catch (error) {
       console.error('Error fetching user profile:', error);
       return null;
-    }
-  }
-
-  async getSavedTracksCount() {
-    try {
-      const data = await this.makeRequest(`/me/tracks?limit=1`);
-      return data.total || 0;
-    } catch (error) {
-      console.error('Error fetching saved tracks count:', error);
-      return 0;
     }
   }
 }
