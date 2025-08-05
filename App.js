@@ -19,21 +19,21 @@ const Tab = createBottomTabNavigator();
 const HomeIcon = () => (
   <Image
     source={require("./assets/house.png")}
-    style={{ width: 28, height: 28, tintColor: 'white', marginBottom: 5,}}
+    style={{ width: 28, height: 28, tintColor: '#9ACA90', marginBottom: 5,}}
   />
 );
 
 const SiftIcon = () => (
   <Image
     source={require("./assets/siftify-icon.png")}
-    style={{ width: 28, height: 28, tintColor: 'white', marginBottom: 5,}}
+    style={{ width: 28, height: 28, tintColor: '#9ACA90', marginBottom: 5,}}
   />
 );
 
 const AccountIcon = () => (
   <Image
     source={require("./assets/account-icon.png")}
-    style={{ width: 28, height: 28, tintColor: 'white', marginBottom: 5,}}
+    style={{ width: 28, height: 28, tintColor: '#9ACA90', marginBottom: 5,}}
   />
 );
 
@@ -42,15 +42,15 @@ function MainTabNavigator() {
     <Tab.Navigator
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: '#272525',
-          borderTopColor: '#7ed957',
+          backgroundColor: '#f5f4e0',
+          borderTopColor: '#9ACA90',
           borderTopWidth: 2,
           height: 95,
           paddingBottom: 10,
           paddingTop: 10,
         },
-        tabBarActiveTintColor: '#7ed957',
-        tabBarInactiveTintColor: '#888',
+        tabBarActiveTintColor: '#266F4C', 
+        tabBarInactiveTintColor: '#9ACA90',
         tabBarLabelStyle: {
           fontSize: 14,
           fontWeight: '600',

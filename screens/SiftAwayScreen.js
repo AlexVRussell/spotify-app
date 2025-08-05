@@ -22,6 +22,7 @@ export default function SiftAwayScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalTracks, setTotalTracks] = useState(0);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState(null); 
 
   const processedTracks = useRef(new Set());
   
@@ -31,6 +32,7 @@ export default function SiftAwayScreen() {
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const rotate = useRef(new Animated.Value(0)).current;
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
 
   const panResponder = useRef(
     PanResponder.create({
@@ -41,15 +43,31 @@ export default function SiftAwayScreen() {
         translateX.stopAnimation();
         translateY.stopAnimation();
         rotate.stopAnimation();
+        overlayOpacity.stopAnimation();
         translateX.setValue(0);
         translateY.setValue(0);
         rotate.setValue(0);
+        overlayOpacity.setValue(0);
+        setSwipeDirection(null);
       },
 
       onPanResponderMove: (evt, gestureState) => {
         translateX.setValue(gestureState.dx);
         translateY.setValue(gestureState.dy);
         rotate.setValue(gestureState.dx);
+
+        const threshold = 50;
+        if (Math.abs(gestureState.dx) > threshold) {
+          const direction = gestureState.dx > 0 ? 'right' : 'left';
+          setSwipeDirection(direction);
+          
+          // Calculate opacity based on swipe distance (max at 120px)
+          const opacity = Math.min(Math.abs(gestureState.dx) / 120, 1);
+          overlayOpacity.setValue(opacity);
+        } else {
+          setSwipeDirection(null);
+          overlayOpacity.setValue(0);
+        }
       },
 
       onPanResponderRelease: (evt, gestureState) => {
@@ -69,9 +87,12 @@ export default function SiftAwayScreen() {
             translateX.setValue(0);
             translateY.setValue(0);
             rotate.setValue(0);
+            overlayOpacity.setValue(0);
+            setSwipeDirection(null);
             setCurrentIndex(prev => prev + 1);
           });
         } else {
+          // Reset the postion if swipe wasnt complte 
           Animated.spring(translateX, {
             toValue: 0,
             useNativeDriver: true,
@@ -84,6 +105,11 @@ export default function SiftAwayScreen() {
             toValue: 0,
             useNativeDriver: true,
           }).start();
+          Animated.spring(overlayOpacity, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+          setSwipeDirection(null);
         }
       },
     })
@@ -99,7 +125,7 @@ export default function SiftAwayScreen() {
     loadInitialTracks();
   }, [selectedPlaylist]);
 
-  // Check if we need to load more tracks
+  // Lazy loading type shit
   useEffect(() => {
     const remainingTracks = tracks.length - currentIndex;
     if (remainingTracks <= PRELOAD_THRESHOLD && !isLoadingMore && currentIndex > 0) {
@@ -198,6 +224,7 @@ export default function SiftAwayScreen() {
       translateX.setValue(0);
       translateY.setValue(0);
       rotate.setValue(0);
+      overlayOpacity.setValue(0);
 
     } catch (error) {
       throw error;
@@ -210,8 +237,7 @@ export default function SiftAwayScreen() {
 
     if (direction === 'left') {
       console.log('Would remove:', currentTrack.name);
-      // Where we would actually remove the track
-      // await removeTrack(currentTrack);
+      // removeTrack(currentTrack) not yet implemented
     } else {
       console.log('Would keep:', currentTrack.name);
     }
@@ -220,6 +246,8 @@ export default function SiftAwayScreen() {
     translateX.setValue(0);
     translateY.setValue(0);
     rotate.setValue(0);
+    overlayOpacity.setValue(0);
+    setSwipeDirection(null);
     setCurrentIndex(prev => prev + 1);
   };
 
@@ -227,7 +255,13 @@ export default function SiftAwayScreen() {
     handleSwipe(direction);
   };
 
-  // Optional: Remove track from playlist/liked songs
+  /**
+   * This method has not been implemented yet.
+   * Once used it will remove a track from the current playlist.
+   * only going to implement this IF this app gets like popular (it will not)
+   * 
+   * @param {*} track 
+   */
   const removeTrack = async (track) => {
     try {
       if (selectedPlaylist.id === 'liked') {
@@ -312,6 +346,23 @@ export default function SiftAwayScreen() {
             <Text style={styles.artistName} numberOfLines={1}>
               {currentTrack.artists?.[0]?.name}
             </Text>
+
+            {/* Swipe Feedback Overlay */}
+            {swipeDirection && (
+              <Animated.View 
+                style={[
+                  styles.swipeOverlay,
+                  {
+                    opacity: overlayOpacity,
+                    backgroundColor: swipeDirection === 'right' ? 'rgba(29, 185, 84, 0.8)' : 'rgba(255, 68, 68, 0.8)'
+                  }
+                ]}
+              >
+                <Text style={styles.swipeText}>
+                  {swipeDirection === 'right' ? 'KEEP' : 'REMOVE'}
+                </Text>
+              </Animated.View>
+            )}
           </Animated.View>
         ) : (
           <Text style={styles.noTracks}>
@@ -328,24 +379,6 @@ export default function SiftAwayScreen() {
         )}
       </View>
 
-      {/* Action Buttons */}
-      {currentTrack && hasMoreTracks && (
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.removeButton}
-            onPress={() => handleButtonSwipe('left')}
-          >
-            <Text style={styles.buttonText}>Remove</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.keepButton}
-            onPress={() => handleButtonSwipe('right')}
-          >
-            <Text style={styles.buttonText}>Keep</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
       <Text style={styles.progressText}>
         {Math.min(currentIndex + 1, totalTracks)} / {totalTracks}
         {tracks.length < totalTracks && ` (${tracks.length} loaded)`}
@@ -357,17 +390,17 @@ export default function SiftAwayScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: '#e9e7cdff',
     paddingTop: 50,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#121212',
+    backgroundColor: '#e9e7cdff',
   },
   loadingText: {
-    color: '#fff',
+    color: '#266F4C',
     marginTop: 10,
   },
   loadingMoreContainer: {
@@ -376,7 +409,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingMoreText: {
-    color: '#bbb',
+    color: '#a69d82',
     marginTop: 5,
     fontSize: 12,
   },
@@ -391,17 +424,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#1DB954',
+    borderColor: '#9ACA90',
     margin: 4,
   },
   selectedPlaylist: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#9ACA90',
   },
   playlistText: {
-    color: '#1DB954',
+    color: '#9ACA90',
   },
   selectedPlaylistText: {
-    color: '#fff',
+    color: '#e9e7cdff',
   },
   cardContainer: {
     flex: 1,
@@ -412,16 +445,17 @@ const styles = StyleSheet.create({
   card: {
     width: width * 0.85,
     height: height * 0.6,
-    backgroundColor: '#333',
+    backgroundColor: '#f6f5e0',
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: '#266F4C',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
     elevation: 5,
+    position: 'relative',
   },
   albumArt: {
     width: width * 0.6,
@@ -434,25 +468,43 @@ const styles = StyleSheet.create({
     height: width * 0.6,
     borderRadius: 10,
     marginBottom: 20,
-    backgroundColor: '#555',
+    backgroundColor: '#d6d4b2',
     justifyContent: 'center',
     alignItems: 'center',
   },
   noImageText: {
-    color: '#bbb',
+    color: '#888872',
     fontSize: 16,
   },
   trackName: {
     fontSize: 22,
-    color: '#fff',
+    color: '#266F4C',
     textAlign: 'center',
     fontWeight: 'bold',
     marginBottom: 5,
   },
   artistName: {
     fontSize: 18,
-    color: '#bbb',
+    color: '#6a6a58',
     textAlign: 'center',
+  },
+  swipeOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  swipeText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#266F4C',
+    textShadowColor: 'rgba(233, 231, 205, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -461,30 +513,30 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   removeButton: {
-    backgroundColor: '#ff4444',
+    backgroundColor: '#b74f4f',
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,
   },
   keepButton: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#266F4C',
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,
   },
   buttonText: {
-    color: '#fff',
+    color: '#e9e7cdff',
     fontSize: 16,
     fontWeight: 'bold',
   },
   progressText: {
-    color: '#bbb',
+    color: '#6f6f60',
     textAlign: 'center',
     paddingBottom: 20,
     fontSize: 16,
   },
   noTracks: {
-    color: '#fff',
+    color: '#266F4C',
     textAlign: 'center',
     fontSize: 18,
   },

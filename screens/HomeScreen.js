@@ -95,7 +95,7 @@ export default function HomeScreen({ navigation }) {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Siftify</Text>
+      <Image source={require('../assets/siftify-logo-v3.2-removebg-preview.png')} style={styles.title} />
         
         <TouchableOpacity onPress={() => navigation.navigate('TopArtistsScreen', { initialTerm: selectedTerm })}>
           <View style={styles.card}>
@@ -223,13 +223,13 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#545454',
+    backgroundColor: '#e9e7cdff',
   },
 
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#545454',
+    backgroundColor: '#e9e7cdff',
   },
 
   centerContent: {
@@ -238,46 +238,45 @@ const styles = StyleSheet.create({
   },
 
   loadingText: {
-    color: 'white',
+    color: '#266F4C',
     fontSize: 16,
     marginTop: 10,
   },
 
   errorText: {
-    color: '#ff6b6b',
+    color: '#b74f4f',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
   },
 
   errorSubtext: {
-    color: 'white',
+    color: '#5f5f44',
     fontSize: 14,
     textAlign: 'center',
     marginTop: 5,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: 'white',
-    marginBottom: 20,
-    marginTop: height * 0.05,
-    textAlign: 'center',
+    width: 45,
+    height: 45,
+    marginTop: height * 0.02,
+    marginBottom: height * 0.01,
+    alignSelf: 'center',
   },
 
   card: {
-    backgroundColor: '#6d6b6bff',
+    backgroundColor: '#f5f4e0',
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#7ed957',
+    borderColor: '#9ACA90',
     padding: 20,
     marginBottom: 15,
     elevation: 2,
     shadowOffset: { width: 10, height: 5 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
-    shadowColor: '#272525ff',
+    shadowColor: '#aaa87d',
   },
 
   row: {
@@ -294,25 +293,25 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'white',
+    color: '#266F4C',
   },
 
   cardContent: {
     fontSize: 16,
-    color: 'white',
+    color: '#444',
     marginTop: 4,
   },
 
   cardSubtext: {
     fontSize: 14,
-    color: '#cccccc',
+    color: '#666',
     marginTop: 2,
     fontStyle: 'italic',
   },
 
   tapHint: {
     fontSize: 12,
-    color: '#7ed957',
+    color: '#9ACA90',
     marginTop: 4,
     fontStyle: 'italic',
   },
@@ -336,7 +335,7 @@ const styles = StyleSheet.create({
   statsTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: 'white',
+    color: '#266F4C',
     textAlign: 'center',
     marginBottom: 12,
   },
@@ -353,12 +352,12 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#7ed957',
+    color: '#266F4C',
   },
 
   statLabel: {
     fontSize: 14,
-    color: '#fff',
+    color: '#555',
     marginTop: 4,
   },
 
@@ -371,14 +370,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f5f4e0',
+    borderWidth: 1,
+    borderColor: '#9ACA90',
   },
 
   selectedTerm: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#9ACA90',
   },
 
   selectedText: {
-    color: 'white',
+    color: '#e9e7cdff',
     fontWeight: 'bold',
   },
 
@@ -388,13 +390,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
     shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
-    shadowColor: '#272525ff',
+    shadowColor: '#aaa87d',
   },
 
   termFooter: {
-    color: 'white',
+    color: '#444',
     fontSize: 16,
     textAlign: 'center',
     marginTop: 10,

@@ -3,7 +3,6 @@ import { Dimensions, View, Text, StyleSheet, TouchableOpacity, Image } from 'rea
 import { authenticateWithSpotify } from '../services/spotifyAuth';
 import { useSpotifyAuth } from '../context/spotifyAuthContext';
 
-// Decompose the dimensions of the window to use for styling
 const { height } = Dimensions.get('window');
 
 export default function LoginScreen() {
@@ -25,7 +24,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Siftify</Text>
-      <Image source={require('../assets/siftify-icon.png')} style={styles.icon} />
+      <Image source={require('../assets/siftify-logo-v3.2-removebg-preview.png')} style={styles.icon} />
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
         <Text style={styles.loginButtonText}>{loading ? 'Logging in...' : 'Login'}</Text>
       </TouchableOpacity>
@@ -43,7 +42,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#545454',
+    backgroundColor: '#e9e7cdff',
   },
   icon: {
     width: 250,
@@ -52,13 +51,16 @@ const styles = StyleSheet.create({
     marginLeft: 22,
   },
   title: {
-    fontFamily : 'Arial',
+    fontFamily: 'Arial',
     fontWeight: 'bold',
     fontSize: 72,
-    color: 'white',
+    color: '#9ACA90',
+    shadowColor: '#266F4C', 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
   },
   loginButton: {
-    backgroundColor: '#7ed957',
+    backgroundColor: '#266F4C',
     padding: 10,
     borderRadius: 7,
     marginBottom: 10,
@@ -66,18 +68,17 @@ const styles = StyleSheet.create({
   loginButtonText: {
     fontFamily: 'Arial',
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#9ACA90',
     fontSize: 32,
     textAlign: 'center',
   },
   token: {
     marginTop: 20,
     fontSize: 14,
-    color: 'white',
+    color: '#FFFFFF', 
   },
   footer: {
     position: 'absolute',
-    color: '#fff',
     bottom: 0,
     left: 0,
     right: 0,
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
   footerText: {
     fontFamily: 'Arial',
     fontSize: 14,
-    color: '#fff',
+    color: '#266F4C', 
     textAlign: 'center',
   },
 });
