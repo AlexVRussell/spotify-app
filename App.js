@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
-import SiftAwayScreen from './screens/SiftAwayScreen';
+import SyftAwayScreen from './screens/SyftAwayScreen';
 import TopArtistsScreen from './screens/TopArtistsScreen';
 import TopTracksScreen from './screens/TopTracksScreen';
 import AccountScreen from './screens/AccountScreen';
@@ -23,9 +23,9 @@ const HomeIcon = () => (
   />
 );
 
-const SiftIcon = () => (
+const SyftIcon = () => (
   <Image
-    source={require("./assets/siftify-icon.png")}
+    source={require("./assets/syfty-logo-final.png")}
     style={{ width: 28, height: 28, tintColor: '#9ACA90', marginBottom: 5,}}
   />
 );
@@ -60,10 +60,10 @@ function MainTabNavigator() {
         }}
       />
       <Tab.Screen 
-        name="SiftAway" 
-        component={SiftAwayScreen}
+        name="syfting" 
+        component={SyftAwayScreen}
         options={{
-          tabBarIcon: SiftIcon,
+          tabBarIcon: SyftIcon,
           headerShown: false,
         }}
       />

@@ -83,7 +83,7 @@ export default function LoginScreen() {
             
             <View style={styles.logoContainer}>
               <Image 
-                source={require('../assets/siftify-logo-v3.2-removebg-preview.png')} 
+                source={require('../assets/syfty-logo-final.png')} 
                 style={styles.logo} 
                 resizeMode="contain"
               />

@@ -104,7 +104,7 @@ export default function HomeScreen({ navigation }) {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-      <Image source={require('../assets/siftify-logo-v3.2-removebg-preview.png')} style={styles.title} />
+      <Image source={require('../assets/syfty-logo-final.png')} style={styles.title} />
         
         <TouchableOpacity onPress={() => navigation.navigate('TopArtistsScreen', { initialTerm: selectedTerm })}>
           <View style={styles.card}>

@@ -6,7 +6,7 @@ const { height } = Dimensions.get('window');
 export default function AccountScreen( { navigation } ) {
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/siftify-logo-v3.2-removebg-preview.png')} style={styles.title} />
+      <Image source={require('../assets/syfty-logo-final.png')} style={styles.title} />
 
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backButtonText}>← Back</Text>

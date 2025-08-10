@@ -2,14 +2,14 @@
   "expo": {
     "name": "spotify-app",
     "slug": "spotify-app",
-    "scheme": "siftify",
+    "scheme": "siftify", // Changed from "syfty" to "siftify"
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/siftify-icon.png",
+    "icon": "./assets/syfty-logo-final.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/siftify-icon.png",
+      "image": "./assets/syfty-logo-final.png",
       "resizeMode": "contain",
       "backgroundColor": "#545454"
     },
@@ -23,14 +23,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/siftify-icon.png",
+        "foregroundImage": "./assets/syfty-logo-final.png",
         "backgroundColor": "#545454"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.spotifyapp"
     },
     "web": {
-      "favicon": "./assets/siftify-icon.png"
+      "favicon": "./assets/syfty-logo-final.png"
     },
     "extra": {
       "eas": {
