@@ -185,7 +185,7 @@ export default function TopArtistsScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#545454',
+    backgroundColor: '#efe7cdff', 
   },
 
   centerContent: {
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     paddingTop: height * 0.05,
     paddingBottom: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#7ed957',
+    borderBottomColor: '#9ACA90',
   },
 
   backButton: {
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     right: 20,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#7ed957',
+    backgroundColor: '#266F4C', 
     borderRadius: 6,
     zIndex: 1000,
     elevation: 5,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#266F4C',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -235,6 +235,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 10,
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    shadowColor: '#aaa87d',
   },
 
   termButton: {
@@ -245,25 +249,27 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#6d6b6b',
+    backgroundColor: '#f5f4e0',
+    borderWidth: 1,
+    borderColor: '#9ACA90',
   },
 
   selectedTerm: {
-    backgroundColor: '#1DB954',
+    backgroundColor: '#9ACA90',
   },
 
   termButtonText: {
-    color: 'white',
+    color: '#266F4C',
     fontSize: 14,
   },
 
   selectedText: {
-    color: 'white',
+    color: '#e9e7cff',
     fontWeight: 'bold',
   },
 
   termFooter: {
-    color: 'white',
+    color: '#444',
     fontSize: 14,
     textAlign: 'center',
     fontStyle: 'italic',
@@ -277,21 +283,21 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#6d6b6b',
+    backgroundColor: '#f5f4e0', 
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#7ed957',
+    borderColor: '#9ACA90',
     padding: 15,
     marginBottom: 10,
     elevation: 2,
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    shadowColor: '#272525',
+    shadowColor: '#aaa87d',
   },
 
   rankBadge: {
-    backgroundColor: '#7ed957',
+    backgroundColor: '#266F4C',
     borderRadius: 15,
     width: 30,
     height: 30,
@@ -301,7 +307,7 @@ const styles = StyleSheet.create({
   },
 
   rankText: {
-    color: 'white',
+    color: '#f5f4e0',
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -322,7 +328,7 @@ const styles = StyleSheet.create({
   placeholderImage: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#ccc',
+    backgroundColor: '#333',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 30,
@@ -341,24 +347,24 @@ const styles = StyleSheet.create({
   artistName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#266F4C',
     marginBottom: 2,
   },
 
   artistGenres: {
     fontSize: 14,
-    color: '#cccccc',
+    color: '#266F4CB3',
     fontStyle: 'italic',
     marginBottom: 2,
   },
 
   artistFollowers: {
     fontSize: 12,
-    color: '#aaaaaa',
+    color: '#9ACA90',
   },
 
   loadingText: {
-    color: 'white',
+    color: '#266F4C',
     fontSize: 16,
     marginTop: 10,
   },
@@ -379,7 +385,7 @@ const styles = StyleSheet.create({
   },
 
   emptyText: {
-    color: 'white',
+    color: '#266F4C',
     fontSize: 16,
     textAlign: 'center',
   },

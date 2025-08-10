@@ -1,12 +1,16 @@
 import React from "react";
-import {Text, View, Dimensions} from "react-native";
+import {Text, View, Dimensions, Image, TouchableOpacity} from "react-native";
 
 const { height } = Dimensions.get('window');
 
-export default function AccountScreen() {
+export default function AccountScreen( { navigation } ) {
   return (
     <View style={styles.container}>
-        <Text style={styles.title}>Account Screen</Text>
+      <Image source={require('../assets/siftify-logo-v3.2-removebg-preview.png')} style={styles.title} />
+
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backButtonText}>← Back</Text>
+      </TouchableOpacity>  
     </View>
   );
 }   
@@ -14,15 +18,35 @@ export default function AccountScreen() {
 const styles = {
     container: {
         flex: 1,
-        backgroundColor: "#545454",
+        backgroundColor: "#efe7cdff",
     },
     title: {
-        flex: 1,
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'white',
-        textAlign: 'center',
-        padding: height * 0.05,
+      width: 45,
+      height: 45,
+      marginTop: height * 0.04,
+      marginBottom: height * 0.02,
+      alignSelf: 'center',
+    },
 
-    }
-}
+    backButton: {
+      position: 'absolute',
+      bottom: 30,
+      right: 20,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      backgroundColor: '#266F4C',
+      borderRadius: 6,
+      zIndex: 1000,
+      elevation: 5,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      shadowColor: '#000',
+    },
+
+    backButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+  }

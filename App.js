@@ -30,13 +30,6 @@ const SiftIcon = () => (
   />
 );
 
-const AccountIcon = () => (
-  <Image
-    source={require("./assets/account-icon.png")}
-    style={{ width: 28, height: 28, tintColor: '#9ACA90', marginBottom: 5,}}
-  />
-);
-
 function MainTabNavigator() {
   return (
     <Tab.Navigator
@@ -48,12 +41,13 @@ function MainTabNavigator() {
           height: 95,
           paddingBottom: 10,
           paddingTop: 10,
+          fontWeight: '600',
         },
         tabBarActiveTintColor: '#266F4C', 
         tabBarInactiveTintColor: '#9ACA90',
         tabBarLabelStyle: {
           fontSize: 14,
-          fontWeight: '600',
+        fontWeight: '1000',
         },
       }}
     >
@@ -73,14 +67,6 @@ function MainTabNavigator() {
           headerShown: false,
         }}
       />
-      <Tab.Screen 
-        name="Account" 
-        component={AccountScreen}
-        options={{
-          tabBarIcon: AccountIcon,
-          headerShown: false,
-        }}
-      />
     </Tab.Navigator>
   );
 }
@@ -97,6 +83,7 @@ function RootNavigator() {
           <Stack.Screen name="MainTabs" component={MainTabNavigator} />
           <Stack.Screen name="TopArtistsScreen" component={TopArtistsScreen} />
           <Stack.Screen name="TopTracksScreen" component={TopTracksScreen} />
+          <Stack.Screen name="AccountScreen" component={AccountScreen} />
         </>
       )}
     </Stack.Navigator>

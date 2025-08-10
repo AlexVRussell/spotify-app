@@ -91,6 +91,15 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.root}>
+      {/* Account Button */}
+      <TouchableOpacity style={styles.accountButton} onPress={() => navigation.navigate('AccountScreen')}>
+        <Image 
+          source={require('../assets/account-icon.png')} 
+          style={styles.accountIcon}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
+
       <ScrollView 
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -237,6 +246,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  accountButton: {
+    position: 'absolute',
+    zIndex: 10,
+    top: 30,
+    right: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: height * 0.016
+  },
+
+  accountIcon: {
+    width: 30,
+    height: 30,
+    tintColor: '#266F4C',
+  },
+
   loadingText: {
     color: '#266F4C',
     fontSize: 16,
@@ -251,7 +276,7 @@ const styles = StyleSheet.create({
   },
 
   errorSubtext: {
-    color: '#5f5f44',
+    color: '#266F4CB3',
     fontSize: 14,
     textAlign: 'center',
     marginTop: 5,
@@ -304,7 +329,7 @@ const styles = StyleSheet.create({
 
   cardSubtext: {
     fontSize: 14,
-    color: '#666',
+    color: '#266F4C',
     marginTop: 2,
     fontStyle: 'italic',
   },
@@ -357,7 +382,7 @@ const styles = StyleSheet.create({
 
   statLabel: {
     fontSize: 14,
-    color: '#555',
+    color: '#266F4CB3',
     marginTop: 4,
   },
 
