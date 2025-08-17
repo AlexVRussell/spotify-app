@@ -168,13 +168,8 @@ class spotifyService {
   }
 
   async getUserProfile() {
-    try {
-      const data = await this.makeRequest(`/me`);
-      return data;
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      return null;
-    }
+    const data = await this.makeRequest(`/me`);
+    return data;
   }
 }
 

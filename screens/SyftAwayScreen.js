@@ -73,16 +73,18 @@ export default function SiftAwayScreen() {
       onPanResponderRelease: (evt, gestureState) => {
         if (Math.abs(gestureState.dx) > 120) {
           const direction = gestureState.dx > 0 ? 'right' : 'left';
+          const swipedTrack = tracks[currentIndex];
 
           Animated.timing(translateX, {
             toValue: direction === 'right' ? 500 : -500,
             duration: 300,
             useNativeDriver: true,
-          }).start(() => {
-            if (direction === 'left') {
-              console.log('Would remove:', tracks[currentIndex]?.name);
+          }).start( async () => {
+            if (direction === 'left' && swipedTrack) {
+              console.log('Would remove:', swipedTrack?.name);
+              await removeTrack(swipedTrack);
             } else {
-              console.log('Would keep:', tracks[currentIndex]?.name);
+              console.log('Would keep:', swipedTrack?.name);
             }
             translateX.setValue(0);
             translateY.setValue(0);
@@ -263,16 +265,37 @@ export default function SiftAwayScreen() {
    * @param {*} track 
    */
   const removeTrack = async (track) => {
-    try {
-      if (selectedPlaylist.id === 'liked') {
-        await spotifyService.unlikeTrack(track.id);
-      } else {
-        await spotifyService.removeTrackFromPlaylist(selectedPlaylist.id, track.uri);
-      }
-    } catch (error) {
-      console.error('Error removing track:', error);
+  console.log("Track received in removeTrack:", track);
+  if (!track) {
+    console.error("❌ No track passed in!");
+    return;
+  }
+
+  try {
+    if (selectedPlaylist.id === "liked") {
+      // Remove from Liked Songs
+      await spotifyService.makeRequest(`/me/tracks`, "DELETE", {
+        ids: [track.id],
+      });
+    } else {
+      // Remove from selected playlist
+      await spotifyService.makeRequest(
+        `/playlists/${selectedPlaylist.id}/tracks`,
+        "DELETE",
+        {
+          tracks: [{ uri: track.uri }],
+        }
+      );
     }
-  };
+
+    // Update local state so UI matches
+    setTracks((prevTracks) => prevTracks.filter((t) => t.id !== track.id));
+
+    console.log(`✅ Removed: ${track.name}`);
+  } catch (err) {
+    console.error("Failed to remove track:", err);
+  }
+};
 
   const currentTrack = tracks[currentIndex];
   const hasMoreTracks = currentIndex < tracks.length;

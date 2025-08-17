@@ -14,7 +14,10 @@ const scopes = ['user-read-recently-played',
   'playlist-read-private',
   'playlist-modify-public',
   'playlist-modify-private',
-  'user-top-read'];
+  'user-top-read',
+  'user-read-private',
+  'user-read-email',
+];
 
 const discovery = {
   authorizationEndpoint: 'https://accounts.spotify.com/authorize',
